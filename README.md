@@ -17,19 +17,19 @@ Check out the live app [here](https://carbonfootprintapp-b20a3.web.app/).
 
 ## Features
 
-* **User-Friendly Interface:** Easy-to-use web interface for inputting personal data.
-* **Travel Impact Calculation:** Estimates carbon emissions based on travel type (car, bus, plane, etc.).
-* **Lifestyle Assessment:** Includes household energy usage, diet, and other daily habits.
-* **Instant Feedback:** Provides users with a calculated carbon footprint and suggestions to reduce it.
-* **Responsive Design:** Works seamlessly on desktop and mobile devices.
+* **User-Friendly Interface**: Easy-to-use web interface for inputting personal data.
+* **Travel Impact Calculation**: Estimates carbon emissions based on travel type (car, bus, plane, etc.).
+* **Lifestyle Assessment**: Includes household energy usage, diet, and other daily habits.
+* **Instant Feedback**: Provides users with a calculated carbon footprint and suggestions to reduce it.
+* **Responsive Design**: Works seamlessly on desktop and mobile devices.
 
 ---
 
 ## Technologies Used
 
-* **Frontend:** HTML, CSS, JavaScript
-* **Frameworks/Libraries:** Firebase Hosting
-* **Hosting:** [Firebase](https://firebase.google.com/)
+* **Frontend**: HTML, CSS, JavaScript
+* **Frameworks/Libraries**: Firebase Hosting
+* **Hosting**: [Firebase](https://firebase.google.com/)
 
 ---
 
@@ -70,5 +70,34 @@ Please fork the repository and submit a pull request.
 
 ---
 
+## License
 
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+This project is licensed under the MIT License.
+
+---
+
+## LICENSE File Content (MIT)
+
+```
+MIT License
+
+Copyright (c) 2025 Hamza Abbasi
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+```
