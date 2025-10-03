@@ -1,4 +1,3 @@
-# carbon_footprints
 # Carbon Footprint Calculator
 
 [![Live App](https://img.shields.io/badge/Live-App-blue)](https://carbonfootprintapp-b20a3.web.app/)
