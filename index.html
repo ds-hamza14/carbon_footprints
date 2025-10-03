@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Carbon Footprint Calculator — Campus MVP</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <style>
+    body { font-family: Arial, sans-serif; margin: 18px; color:#222; }
+    header { display:flex; align-items:center; gap:12px; }
+    h1 { color: #1b8a3e; margin:0; font-size:28px; }
+    .card { border:1px solid #eee; padding:14px; border-radius:8px; max-width:820px; }
+    label { display:block; margin-top:10px; font-weight:600; }
+    select,input { padding:8px; font-size:15px; width:100%; max-width:420px; margin-top:6px; }
+    .row { display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin-top:8px; }
+    button { background:#1b8a3e; color:#fff; border:0; padding:10px 14px; border-radius:6px; cursor:pointer; }
+    button.secondary { background:#f0f0f0; color:#111; }
+    #resultBox { margin-top:16px; padding:12px; border-radius:8px; background:#f7fff8; }
+    ul.tips { margin:8px 0 0 18px; }
+    .small { font-size:13px; color:#555; }
+    footer.small { margin-top:18px; color:#666; font-size:13px; }
+    .flex-between { display:flex; justify-content:space-between; align-items:center; gap:12px; }
+    .user { display:flex; align-items:center; gap:8px; }
+    .avatar { width:36px; height:36px; border-radius:50%; object-fit:cover; border:1px solid #ddd; }
+  </style>
+</head>
+<body>
+
+<header class="flex-between">
+  <div style="display:flex;align-items:center;gap:12px">
+    <img src="club-logo.png"
+         alt="Club Logo" width="60" 
+         style="border-radius:8px;background:#fff;padding:4px;box-shadow:0 1px 3px rgba(0,0,0,0.05)"/>
+    <h1>Carbon Footprint Calculator</h1>
+  </div>
+
+  <div class="user">
+    <div id="userArea" style="display:flex;align-items:center;gap:10px">
+      <button id="signInBtn">Sign in with Google</button>
+      <button id="signOutBtn" style="display:none;" class="secondary">Sign out</button>
+    </div>
+  </div>
+</header>
+
+<main style="margin-top:18px">
+  <div class="card">
+    <p class="small">Quickly estimate your carbon emissions for common student activities. Fill in the fields below and press <b>Calculate</b>. Sign in to save results to campus leaderboard (optional).</p>
+
+    <!-- FORM -->
+    <form id="calcForm" onsubmit="return false;">
+      <label for="transportMode">Transport mode</label>
+      <select id="transportMode">
+        <option value="car">Car (passenger)</option>
+        <option value="motorcycle">Motorcycle</option>
+        <option value="bus">Bus</option>
+        <option value="train">Train</option>
+        <option value="bike">Bicycle</option>
+        <option value="walk">Walking</option>
+      </select>
+
+      <label for="transportKm">Transport distance (km)</label>
+      <input id="transportKm" type="number" min="0" step="0.1" placeholder="e.g., 4.5" value="0" />
+
+      <label for="electricityKwh">Electricity used (kWh) — e.g., laptop, lights, AC (total)</label>
+      <input id="electricityKwh" type="number" min="0" step="0.1" placeholder="e.g., 3.5" value="0" />
+
+      <label for="diet">Diet (choose your typical daily diet; we will multiply by days)</label>
+      <select id="diet">
+        <option value="meat">Meat-heavy</option>
+        <option value="mixed">Mixed</option>
+        <option value="vegetarian">Vegetarian</option>
+        <option value="vegan">Vegan</option>
+      </select>
+
+      <label for="days">Days counted (for diet) — e.g., 1 for today or 7 for a week</label>
+      <input id="days" type="number" min="1" step="1" value="1" />
+
+      <label for="plasticBottles">Disposable plastic bottles used (count)</label>
+      <input id="plasticBottles" type="number" min="0" step="1" value="0" />
+
+      <div class="row" style="margin-top:14px;">
+        <button id="calcBtn" type="button">Calculate</button>
+        <button id="saveBtn" type="button" class="secondary">Save (requires sign-in)</button>
+        <div style="flex:1"></div>
+        <div id="statusMsg" class="small" style="color:#666"></div>
+      </div>
+    </form>
+
+    <!-- RESULT -->
+    <div id="resultBox" style="display:none;">
+      <h3 id="totalText">Total: — kg CO₂</h3>
+      <div id="breakdownArea"></div>
+      <p id="equivalentText" class="small"></p>
+      <details style="margin-top:8px;">
+        <summary>How we calculate (emission factors)</summary>
+        <ul class="small">
+          <li>Car: 0.21 kg CO₂ per km</li>
+          <li>Motorcycle: 0.10 kg CO₂ per km</li>
+          <li>Bus: 0.05 kg CO₂ per km</li>
+          <li>Train: 0.05 kg CO₂ per km</li>
+          <li>Electricity: 0.5 kg CO₂ per kWh (placeholder — replace with local grid factor)</li>
+          <li>Diet factors: meat 7.0, mixed 4.5, vegetarian 2.5, vegan 1.8 kg CO₂ per day</li>
+          <li>Plastic bottle: 0.06 kg CO₂ per bottle</li>
+        </ul>
+      </details>
+    </div>
+
+    <div style="margin-top:12px">
+      <strong>Quick tips:</strong>
+      <ul class="tips">
+        <li>Take public transport or carpool to reduce per-person emissions.</li>
+        <li>Cut one meat meal per week — small change, measurable impact.</li>
+        <li>Refill a reusable bottle to avoid disposable bottles.</li>
+      </ul>
+    </div>
+  </div>
+
+  <footer class="small">Tip: Run on <code>http://localhost:5000</code> (Live Server or Python http.server) to enable sign-in.</footer>
+</main>
+
+<!-- Firebase v8 SDKs (works with simple <script> approach) -->
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+
+<script>
+/* =========== CONFIG =========== 
+   Replace this firebaseConfig with your Firebase project's config from console.
+   Make sure Google Auth is enabled and authorized domains include localhost.
+*/
+const firebaseConfig = {
+  apiKey: "AIzaSyD-Ne_b_w6bXv6zHf7R8y4XCpURU33E5cY",
+  authDomain: "carbonfootprintapp-b20a3.firebaseapp.com",
+  projectId: "carbonfootprintapp-b20a3",
+  storageBucket: "carbonfootprintapp-b20a3.firebasestorage.app",
+  messagingSenderId: "550105037371",
+  appId: "1:550105037371:web:e8357ccf43ec97c0d77a1e",
+  measurementId: "G-5QEKYBK2YW"
+};
+
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.firestore();
+
+/* =========== EMISSION FACTORS =========== */
+const FACTORS = {
+  transport: {
+    car: 0.21,
+    motorcycle: 0.10,
+    bus: 0.05,
+    train: 0.05,
+    bike: 0.0,
+    walk: 0.0
+  },
+  electricity_kwh: 0.5,
+  diet_daily: {
+    meat: 7.0,
+    mixed: 4.5,
+    vegetarian: 2.5,
+    vegan: 1.8
+  },
+  plastic_bottle: 0.06
+};
+
+/* =========== ELEMENTS =========== */
+const transportModeEl = document.getElementById('transportMode');
+const transportKmEl   = document.getElementById('transportKm');
+const electricityEl   = document.getElementById('electricityKwh');
+const dietEl          = document.getElementById('diet');
+const daysEl          = document.getElementById('days');
+const bottlesEl       = document.getElementById('plasticBottles');
+const calcBtn         = document.getElementById('calcBtn');
+const saveBtn         = document.getElementById('saveBtn');
+const resultBox       = document.getElementById('resultBox');
+const totalText       = document.getElementById('totalText');
+const breakdownArea   = document.getElementById('breakdownArea');
+const equivalentText  = document.getElementById('equivalentText');
+const statusMsg       = document.getElementById('statusMsg');
+const signInBtn       = document.getElementById('signInBtn');
+const signOutBtn      = document.getElementById('signOutBtn');
+
+/* current user (null if not signed in) */
+let currentUser = null;
+
+/* =========== AUTH HANDLERS =========== */
+signInBtn.addEventListener('click', () => {
+  const provider = new firebase.auth.GoogleAuthProvider();
+  firebase.auth().signInWithPopup(provider)
+    .catch(err => {
+      alert('Sign-in failed: ' + err.message);
+      console.error(err);
+    });
+});
+
+signOutBtn.addEventListener('click', () => {
+  firebase.auth().signOut().catch(err => console.error(err));
+});
+
+auth.onAuthStateChanged(user => {
+  currentUser = user;
+  if (user) {
+    signInBtn.style.display = 'none';
+    signOutBtn.style.display = 'inline-block';
+    statusMsg.innerText = `Signed in as ${user.displayName}`;
+  } else {
+    signInBtn.style.display = 'inline-block';
+    signOutBtn.style.display = 'none';
+    statusMsg.innerText = 'Not signed in — you can save results after signing in.';
+  }
+});
+
+/* =========== CALCULATION =========== */
+function calculate() {
+  const transportMode = transportModeEl.value;
+  const transportKm = parseFloat(transportKmEl.value) || 0;
+  const electricity = parseFloat(electricityEl.value) || 0;
+  const diet = dietEl.value;
+  const days = Math.max(1, parseInt(daysEl.value) || 1);
+  const bottles = parseInt(bottlesEl.value) || 0;
+
+  // compute parts
+  const transportCo2 = (FACTORS.transport[transportMode] || 0) * transportKm;
+  const electricityCo2 = (FACTORS.electricity_kwh || 0) * electricity;
+  const dietCo2 = (FACTORS.diet_daily[diet] || FACTORS.diet_daily['mixed']) * days;
+  const bottlesCo2 = (FACTORS.plastic_bottle || 0) * bottles;
+
+  const total = transportCo2 + electricityCo2 + dietCo2 + bottlesCo2;
+
+  // equivalents: kilometers driven equivalent using car factor
+  const kmEquiv = (FACTORS.transport.car > 0) ? (total / FACTORS.transport.car) : null;
+
+  // show UI
+  totalText.innerText = `Total: ${total.toFixed(3)} kg CO₂`;
+  breakdownArea.innerHTML = `
+    <div class="small">
+      <strong>Breakdown</strong>
+      <ul>
+        <li>Transport: ${transportCo2.toFixed(3)} kg CO₂ (${transportMode}, ${transportKm} km)</li>
+        <li>Electricity: ${electricityCo2.toFixed(3)} kg CO₂ (${electricity} kWh)</li>
+        <li>Diet: ${dietCo2.toFixed(3)} kg CO₂ (${diet}, ${days} day(s))</li>
+        <li>Plastic bottles: ${bottlesCo2.toFixed(3)} kg CO₂ (${bottles} bottles)</li>
+      </ul>
+    </div>
+  `;
+  equivalentText.innerText = kmEquiv !== null ? `Equivalent to driving approx. ${kmEquiv.toFixed(1)} km in a car.` : '';
+
+  resultBox.style.display = 'block';
+
+  // return structured object for saving
+  return {
+    transportMode, transportKm, transportCo2,
+    electricity, electricityCo2,
+    diet, days, dietCo2,
+    bottles, bottlesCo2,
+    total
+  };
+}
+
+/* =========== SAVE (Firestore) =========== */
+async function saveResult(record) {
+  if (!currentUser) {
+    alert('Please sign in to save your result.');
+    return;
+  }
+  try {
+    await db.collection('carbonFootprint').add({
+      uid: currentUser.uid,
+      name: currentUser.displayName || null,
+      email: currentUser.email || null,
+      transportMode: record.transportMode,
+      transportKm: record.transportKm,
+      electricity: record.electricity,
+      diet: record.diet,
+      days: record.days,
+      bottles: record.bottles,
+      totalKgCO2: record.total,
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    alert('Result saved to campus leaderboard!');
+  } catch (err) {
+    console.error('Error saving:', err);
+    alert('Error saving result: ' + (err.message || err));
+  }
+}
+
+/* =========== BUTTONS =========== */
+calcBtn.addEventListener('click', () => {
+  // calculate and show
+  const record = calculate();
+  // enable save button if signed in
+  saveBtn.disabled = false;
+});
+
+saveBtn.addEventListener('click', async () => {
+  const record = calculate();
+  await saveResult(record);
+});
+
+/* =========== initial state =========== */
+saveBtn.disabled = false; // saving allowed (will require sign-in to actually persist)
+
+</script>
+</body>
+</html>

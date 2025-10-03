@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Carbon Footprint Leaderboard</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; }
+    h1 { color: green; }
+    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+    th, td { border: 1px solid #ddd; padding: 10px; text-align: center; }
+    th { background-color: #4CAF50; color: white; }
+    tr:nth-child(even) { background-color: #f9f9f9; }
+
+    /* 🏅 Medal styles */
+    .gold { background-color: #FFD700 !important; font-weight: bold; }
+    .silver { background-color: #C0C0C0 !important; font-weight: bold; }
+    .bronze { background-color: #CD7F32 !important; font-weight: bold; }
+  </style>
+</head>
+<body>
+  <h1>🌍 Carbon Footprint Leaderboard</h1>
+  <p>Track and compare results from all users</p>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Rank 🏆</th>
+        <th>Name</th>
+        <th>Transport</th>
+        <th>Distance (km)</th>
+        <th>Footprint (kg CO₂)</th>
+        <th>Time</th>
+      </tr>
+    </thead>
+    <tbody id="leaderboard"></tbody>
+  </table>
+
+  <!-- ✅ Firebase v8 SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+
+  <script>
+    // ✅ Firebase config
+    const firebaseConfig = {
+      apiKey: "AIzaSyD-Ne_b_w6bXv6zHf7R8y4XCpURU33E5cY",
+      authDomain: "carbonfootprintapp-b20a3.firebaseapp.com",
+      projectId: "carbonfootprintapp-b20a3",
+      storageBucket: "carbonfootprintapp-b20a3.firebasestorage.app",
+      messagingSenderId: "550105037371",
+      appId: "1:550105037371:web:e8357ccf43ec97c0d77a1e",
+      measurementId: "G-5QEKYBK2YW"
+    };
+
+    // ✅ Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    // ✅ Fetch leaderboard
+    db.collection("carbonFootprint")
+      .orderBy("footprint", "asc") // lowest footprint first
+      .onSnapshot(snapshot => {
+        const leaderboard = document.getElementById("leaderboard");
+        leaderboard.innerHTML = "";
+
+        let rank = 1;
+        snapshot.forEach(doc => {
+          const data = doc.data();
+
+          // Assign medal style for top 3
+          let medalClass = "";
+          if (rank === 1) medalClass = "gold";
+          else if (rank === 2) medalClass = "silver";
+          else if (rank === 3) medalClass = "bronze";
+
+          const row = `
+            <tr class="${medalClass}">
+              <td><b>${rank}</b></td>
+              <td>${data.name || "Anonymous"}</td>
+              <td>${data.transport}</td>
+              <td>${data.distance}</td>
+              <td>${data.footprint.toFixed(2)}</td>
+              <td>${data.timestamp ? new Date(data.timestamp.toDate()).toLocaleString() : ""}</td>
+            </tr>`;
+          leaderboard.innerHTML += row;
+          rank++;
+        });
+      });
+  </script>
+</body>
+</html>
